@@ -1,0 +1,25 @@
+{%extends "base.html"%}
+{%block content%}
+<form method="POST" style="font-size: 16px; color: #333;">
+    {{form.hidden_tag()}}
+    {{form.name.label(class = "form-label fs-4 text-white")}}
+    <br>
+    {{form.name(class= 'form-control',size=32)}}
+    <br>
+    {{form.prn.label(class = "form-label fs-4 text-white")}}
+    <br>
+    {{form.prn(class= 'form-control',size=32)}}
+    <br>
+    {{form.password.label(class = "form-label fs-4 text-white")}}
+    <br>
+    {{form.password(class= 'form-control',size=32)}}
+    <br>
+    {{form.submit(class="btn
+    btn-primary w-100 p-3 fs-4")}}
+
+</form>
+
+
+
+
+{%endblock%}
