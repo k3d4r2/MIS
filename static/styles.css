@@ -1,0 +1,37 @@
+
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #8d8583, #0f0e0f, #33a6ff, #33ff68);
+    background-size: 400% 400%;
+    animation: backgroundAnimation 10s linear infinite;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+
+  @keyframes backgroundAnimation {
+    0% {
+      background-position: 0% 50%;
+    }
+    25% {
+      background-position: 100% 50%;
+    }
+    50% {
+      background-position: 0% 50%;
+    }
+    75% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+}
+
+.content-container {
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}

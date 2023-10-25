@@ -1,21 +1,20 @@
 from flask import Flask
 from flask_wtf import FlaskForm
 from wtforms import StringField,SubmitField
-from wtforms import DecimalField,EmailField,PasswordField
+from wtforms import DecimalField,EmailField,PasswordField, IntegerField
 from wtforms.validators import DataRequired,EqualTo
 from flask import render_template
 from flask_bootstrap import Bootstrap
 
-app =Flask("HI")
+app =Flask(__name__, static_folder='./static')
 
 
 app.config['SECRET_KEY'] = "hello_everynyan"
 
 
-
 class SignupForm(FlaskForm):
     name = StringField("Name",validators=[DataRequired()])
-    prn = DecimalField("Prn",validators=[DataRequired()])
+    prn = IntegerField("PRN",validators=[DataRequired()])
     mail = EmailField("Email",validators=[DataRequired()])
     password = PasswordField("Password",validators=[DataRequired(),EqualTo(fieldname='confirm',message="password must match")])
     confirm = PasswordField("Confirm Password",validators=[DataRequired()])
