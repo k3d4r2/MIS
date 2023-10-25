@@ -29,8 +29,10 @@ class SignupForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     prn = IntegerField("PRN", validators=[DataRequired()])
     mail = EmailField("Email",  validators=[DataRequired()])
-    password = PasswordField("Password", validators=[InputRequired(), EqualTo(fieldname='confirm', message="password must match")])
-    confirm = PasswordField("Confirm Password", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[InputRequired(),
+                                                     EqualTo(fieldname='confirm',
+                                                     message="Oops! It seems like the passwords you entered don't match. Please check and try again.")])
+    confirm = PasswordField("Confirm Password", validators=[InputRequired()])
     submit = SubmitField("Submit")
 
 
@@ -62,6 +64,7 @@ def signup():
 
     # passwords don't match
     if (form.password.errors):
+        print(form.password.errors)
         flash(form.password.errors[0])
 
     return render_template("signup.html", form=form)
