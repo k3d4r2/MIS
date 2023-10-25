@@ -1,50 +1,37 @@
 
 {% extends "base.html"%}
-<!DOCTYPE html>
-<html>
-<head>
 
-    <title style="font-size: 24px; color: #333;">Sign up</title>
-
-  
-</head>
-<body>
-
-<div class="content-container">
-  {% block content %}
-  {% if name  %}
-      <h1 style="font-size: 24px; color: #333;">Hello {{ name }}</h1>
-  {% else %}
-      <br>
-      <form method="POST" style="font-size: 16px; color: #333;">
-          {{ form.hidden_tag() }}
-          {{ form.name.label(class="form-label fs-4 text-white", ) }}
-          <br>
-          {{ form.name(class='form-control ',size = 32) }}
-          <br>          {{ form.prn.label(class="form-label fs-4 text-white") }}
-          <br>
-          {{ form.prn(class = 'form-control ',size = 32) }}
-          <br>
-          {{ form.mail.label(class="form-label fs-4 text-white")}}
-          <br>
-          {{ form.mail(class = 'form-control',size =32) }}
-          <br>
-          {{ form.password.label(class="form-label fs-4 text-white",size =32) }}
-          <br>
-          {{ form.password(class = 'form-control ',size = 32) }}
-          <br>
-          {{ form.confirm.label(class="form-label fs-4 text-white",size=32) }}
-          <br>
-          {{ form.confirm(class = "form-control",size =32) }}
-          <br>
-          <br>
-          {{ form.submit(class="btn
-          btn-primary w-100 p-3 fs-4") }}
-      </form>
-  {% endif %}
-  {% endblock %}
-  </div>
-
-
-</body>
-</html>
+{% block content %}
+<div class="form-container">
+    {% if name  %}
+        <h1 style="font-size: 24px; color: #333;">Hello {{ name }}</h1>
+    {% else %}
+    <br>
+    <form method="POST" style="font-size: 16px; color: #333;">
+        {{ form.hidden_tag() }}
+        {{ form.csrf_token() }}
+        {{ form.name.label(class="form-label fs-4 text-white", ) }}
+        <br>
+        {{ form.name(class='form-control ',size = 32) }}
+        <br>          {{ form.prn.label(class="form-label fs-4 text-white") }}
+        <br>
+        {{ form.prn(class='form-control ',size = 32) }}
+        <br>
+        {{ form.mail.label(class="form-label fs-4 text-white")}}
+        <br>
+        {{ form.mail(class='form-control',size =32) }}
+        <br>
+        {{ form.password.label(class="form-label fs-4 text-white",size =32) }}
+        <br>
+        {{ form.password(class='form-control ',size = 32) }}
+        <br>
+        {{ form.confirm.label(class="form-label fs-4 text-white",size=32) }}
+        <br>
+        {{ form.confirm(class="form-control",size =32) }}
+        <br>
+        <br>
+        {{ form.submit(class="btn btn-primary w-100 p-3 fs-4") }}
+    </form>
+    {% endif %}
+</div>
+{% endblock %}
