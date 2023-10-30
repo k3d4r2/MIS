@@ -7,6 +7,8 @@ from flask_bootstrap import Bootstrap
 import json
 import sys
 import pyrebase
+import re
+import requests
 
 
 config = None
@@ -23,6 +25,11 @@ app.config['SECRET_KEY'] = "hello_everynyan"
 
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
+
+
+def httpErrortoJSON(http_error):
+    http_error = json.loads(re.sub(r'\[.*?\]', '', str(http_error)))
+    return http_error
 
 
 class SignupForm(FlaskForm):
@@ -53,12 +60,15 @@ def signup():
         prn = form.prn.data
         mail = form.mail.data
         password = form.password.data
-
         confirm = form.confirm.data
 
-        flash('Created successfull ' + name)
-
-        user = auth.create_user_with_email_and_password(mail, password)
+        try:
+            auth.create_user_with_email_and_password(mail, password)
+            flash('Created successfull ' + name)
+        except requests.exceptions.HTTPError as e:
+            response = httpErrortoJSON(e)
+            if response['error']['code'] == 400:
+                flash("Email already exists!")
 
         return redirect(url_for("login"))
 
