@@ -1,0 +1,11 @@
+
+{% extends 'base.html' %}
+{% block content %}
+{% if users %}
+<ul class="list-group list-group-flush">
+{% for user in users %}
+<li class="list-group-item">UID: {{ user.uid }} Email: {{ user.email }}</li>
+{% endfor %}
+</ul
+{% endif %}
+{% endblock %}

@@ -1,14 +1,14 @@
-from flask import Flask, render_template, flash, url_for, redirect
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms import DecimalField, EmailField, PasswordField, IntegerField
-from wtforms.validators import DataRequired, EqualTo, InputRequired
+from flask import Flask, render_template, flash, url_for, redirect, session
 from flask_bootstrap import Bootstrap
 import json
 import sys
 import pyrebase
 import re
 import requests
+from forms import SignupForm, LoginForm
+from functools import wraps
+import firebase_admin
+from firebase_admin import credentials, auth
 
 
 config = None
@@ -22,9 +22,15 @@ if not config:
 app = Flask(__name__, static_folder='./static')
 
 app.config['SECRET_KEY'] = "hello_everynyan"
+app.config['SESSION_TYPE'] = 'filesystem'
+
+
+cred = credentials.Certificate("./mis-dummy.json")
+firebase_admin.initialize_app(cred)
+
 
 firebase = pyrebase.initialize_app(config)
-auth = firebase.auth()
+client_auth = firebase.auth()
 
 
 def httpErrortoJSON(http_error):
@@ -32,39 +38,31 @@ def httpErrortoJSON(http_error):
     return http_error
 
 
-class SignupForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired()])
-    prn = IntegerField("PRN", validators=[DataRequired()])
-    mail = EmailField("Email",  validators=[DataRequired()])
-    password = PasswordField("Password", validators=[InputRequired(),
-                                                     EqualTo(fieldname='confirm',
-                                                     message="Oops! It seems like the passwords you entered don't match. Please check and try again.")])
-    confirm = PasswordField("Confirm Password", validators=[InputRequired()])
-    submit = SubmitField("Submit")
+def login_required(func):
+    wraps(func)
+
+    def secure_function(*args, **kwargs):
+        if not session.get("logged_in"):
+            return redirect(url_for("login"))
+        return func(*args, **kwargs)
+    return secure_function
 
 
-class LoginForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired()])
-    prn = DecimalField("PRN", validators=[DataRequired()])
-    password = PasswordField("Password", validators=[DataRequired()])
-    submit = SubmitField("Submit")
-
-
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/signup', methods=['GET', 'POST'])
 def signup():
 
-    form = SignupForm()
+    if session.get('logged_in'):
+        return redirect(url_for("home"))
 
+    form = SignupForm()
     if form.validate_on_submit():
-        name = form.name.data
-        prn = form.prn.data
         mail = form.mail.data
         password = form.password.data
         confirm = form.confirm.data
 
         try:
-            auth.create_user_with_email_and_password(mail, password)
-            flash('Created successfull ' + name)
+            client_auth.create_user_with_email_and_password(mail, password)
+            flash('Created successfull')
         except requests.exceptions.HTTPError as e:
             response = httpErrortoJSON(e)
             if response['error']['code'] == 400:
@@ -74,26 +72,73 @@ def signup():
 
     # passwords don't match
     if (form.password.errors):
-        print(form.password.errors)
         flash(form.password.errors[0])
 
     return render_template("signup.html", form=form)
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def login():
+
+    if session.get('logged_in'):
+        return redirect(url_for("home"))
+
     name = None
-    prn = None
     password = None
     form = LoginForm()
     if form.validate_on_submit():
 
-        name = form.name.data
-        prn = form.name.data
+        mail = form.mail.data
         password = form.password.data
 
-        # DATABASE
-    return render_template("login.html", name=name, prn=prn, form=form)
+        # check if user exists
+        try:
+            user = auth.get_user_by_email(mail)
+        except auth.UserNotFoundError:
+            flash("User doesn't exists! Please create an account")
+            return redirect(url_for('signup'))
+
+        try:
+            user = client_auth.sign_in_with_email_and_password(mail, password)
+        except requests.exceptions.HTTPError as e:
+            response = httpErrortoJSON(e)
+            if response['error']['code'] == 400:
+                flash("Invalid credentials")
+            return redirect(url_for('login'))
+
+        session['user'] = user
+        session['logged_in'] = True
+
+        return render_template("home.html")
+
+    return render_template("login.html", form=form)
+
+
+@app.route('/home', endpoint='home')
+@login_required
+def home():
+    return render_template("home.html")
+
+
+@app.route('/logout', endpoint='logout')
+@login_required
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for("login"))
+
+
+@app.route('/users', endpoint='users')
+@login_required
+def users():
+    page = auth.list_users()
+
+    users = []
+    while page:
+        for user in page.users:
+            users.append({"uid": user.uid, "email": user.email})
+        page = page.get_next_page()
+
+    return render_template("users.html", users=users)
 
 
 if __name__ == "__main__":
