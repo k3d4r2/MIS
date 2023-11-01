@@ -5,10 +5,6 @@ charset-normalizer==3.3.1
 click==8.1.7
 cryptography==41.0.5
 Deprecated==1.2.14
-<<<<<<< HEAD
-=======
-click==8.1.7
->>>>>>> ab2e21fbd79b2644e643b42a4447111fbb290d29
 dominate==2.8.0
 Flask==3.0.0
 Flask-Admin==1.6.1
@@ -39,28 +35,4 @@ urllib3==1.26.18
 visitor==0.1.3
 Werkzeug==3.0.1
 wrapt==1.15.0
-<<<<<<< HEAD
-=======
-gcloud==0.17.0
-googleapis-common-protos==1.61.0
-httplib2==0.22.0
-itsdangerous==2.1.2
-Jinja2==3.1.2
-jws==0.1.3
-MarkupSafe==2.1.3
-oauth2client==3.0.0
-protobuf==4.25.0rc2
-pyasn1==0.5.0
-pyasn1-modules==0.3.0
-pycryptodome==3.4.3
-pyparsing==3.1.1
-Pyrebase==3.0.27
-python-jwt==2.0.1
-requests==2.11.1
-requests-toolbelt==0.7.0
-rsa==4.9
-six==1.16.0
-visitor==0.1.3
-Werkzeug==3.0.1
->>>>>>> ab2e21fbd79b2644e643b42a4447111fbb290d29
 WTForms==3.1.0
