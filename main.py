@@ -32,6 +32,7 @@ firebase_admin.initialize_app(cred)
 firebase = pyrebase.initialize_app(config)
 client_auth = firebase.auth()
 
+# session.permanent = False
 
 def httpErrortoJSON(http_error):
     http_error = json.loads(re.sub(r'\[.*?\]', '', str(http_error)))
@@ -65,8 +66,16 @@ def signup():
             flash('Created successfull')
         except requests.exceptions.HTTPError as e:
             response = httpErrortoJSON(e)
+            print(response)
             if response['error']['code'] == 400:
-                flash("Email already exists!")
+
+                if response['error']['code'] == 'EMAIL_EXISTS':
+                    flash("Email already exists")
+                    return redirect(url_for('login'))
+
+                flash(response['error']['message'])
+
+                return redirect(url_for('signup'))
 
         return redirect(url_for("login"))
 
@@ -124,6 +133,7 @@ def home():
 @login_required
 def logout():
     session.pop('logged_in', None)
+    session.clear()
     return redirect(url_for("login"))
 
 
