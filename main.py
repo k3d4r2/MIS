@@ -34,6 +34,7 @@ client_auth = firebase.auth()
 
 # session.permanent = False
 
+
 def httpErrortoJSON(http_error):
     http_error = json.loads(re.sub(r'\[.*?\]', '', str(http_error)))
     return http_error
@@ -46,7 +47,47 @@ def login_required(func):
         if not session.get("logged_in"):
             return redirect(url_for("login"))
         return func(*args, **kwargs)
+
     return secure_function
+
+
+def admin_required(func):
+    wraps(func)
+
+    def secure_function(*args, **kwargs):
+        if not session.get("logged_in"):
+            return redirect(url_for("login"))
+        return func(*args, **kwargs)
+
+    return secure_function
+
+
+@login_required
+@app.context_processor
+def is_admin():
+    '''
+    Wrapper function to check if the user is admin or not
+    '''
+    user = session.get('user')
+
+    if user:
+        # uid = user['localId']
+        id_token = user['idToken']
+
+        # check if user is admin
+        claims = auth.verify_id_token(id_token)
+
+        print(claims)
+
+        if 'admin' in claims:
+            if claims['admin'] is True:
+                print("==============Is admin==================")
+                return {'is_admin': True}
+
+        print("==============Is not a admin==================")
+        return {'is_admin': False}
+
+    return {'is_admin': False}
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -92,7 +133,6 @@ def login():
     if session.get('logged_in'):
         return redirect(url_for("home"))
 
-    name = None
     password = None
     form = LoginForm()
     if form.validate_on_submit():
@@ -117,6 +157,9 @@ def login():
 
         session['user'] = user
         session['logged_in'] = True
+
+        print(session.get('user'))
+        # is_admin()
 
         return render_template("home.html")
 
