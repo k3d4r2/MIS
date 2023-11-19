@@ -62,9 +62,24 @@ def admin_required(func):
     return secure_function
 
 
+def is_admin(uid):
+    '''
+        Generic method which return True if user is admin or else false
+    '''
+    user = auth.get_user(uid)
+    if user.custom_claims is not None:
+        if 'admin' in user.custom_claims:
+            return True
+    return False
+
+
+def make_admin(uid):
+    auth.set_custom_user_claims(uid, {'admin': True})
+
+
 @login_required
 @app.context_processor
-def is_admin():
+def is_cur_user_admin():
     '''
     Wrapper function to check if the user is admin or not
     '''
@@ -188,7 +203,10 @@ def users():
     users = []
     while page:
         for user in page.users:
-            users.append({"uid": user.uid, "email": user.email})
+
+            users.append({"uid": user.uid, "email": user.email,
+                          "is_admin": is_admin(user.uid)})
+
         page = page.get_next_page()
 
     return render_template("users.html", users=users)

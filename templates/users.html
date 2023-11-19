@@ -3,9 +3,22 @@
 {% block content %}
 {% if users %}
 <ul class="list-group list-group-flush">
-{% for user in users %}
-<li class="list-group-item">UID: {{ user.uid }} Email: {{ user.email }}</li>
-{% endfor %}
+    {% for user in users %}
+    <li class="list-group-item" style=>
+        UID: 
+        <span style="font-weight: bold;">{{ user.uid }}</span>
+        Email: 
+        <span style="font-weight: bold;">{{ user.email }}</span>
+        <span class="right">
+            Is Admin:  
+            {% if user.is_admin %} 
+            Yes
+            {% else %}
+            No
+            {% endif %}
+        </span
+    </li>
+    {% endfor %}
 </ul
 {% endif %}
 {% endblock %}
