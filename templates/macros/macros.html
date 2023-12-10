@@ -1,0 +1,50 @@
+
+{% macro userProfileWindow(user) %}
+<div class="user-container" id="user-{{ user.uid }}">
+    <div class="floating-button">
+        <i class="bi bi-x-circle" onclick="toggleUserProfile('{{ user.uid }}')"></i>
+    </div>
+    <div class="user-image">
+        <img src="{{ url_for('static', filename='images/profileimage.jpeg') }}"
+            style="height: 400px"
+        >
+    </div>
+    <div class="user-profile">
+        User UID: {{ user.uid }}<br>
+        User Email: {{ user.email }}
+        {% if user.admin %}
+            <button onclick="removeAdmin('{{ user.uid }}')">Remove as admin</button>
+        {% else %}
+            <button onclick="makeAdmin('{{ user.uid }}')">Add as admin</button>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+</script>
+{% endmacro %}
+
+{% macro userProfile(user) %}
+<a onclick="toggleUserProfile('{{ user.uid }}')">
+    <li class="list-group-item" style="z-index: 0">
+        UID: 
+        <span style="font-weight: bold;">{{ user.uid }}</span>
+        Email: 
+        <span style="font-weight: bold;">{{ user.email }}</span>
+        {% if user.admin %}
+        <span class="badge rounded-pill text-bg-primary">Admin</span>
+        {% else %}
+        <span class="badge rounded-pill text-bg-warning">Not admin</span>
+        {% endif %}
+    </li>
+</a>
+
+{{ userProfileWindow(user) }}
+{% endmacro %}
+
+
+{% macro userList(users) %}
+{% for user in users %}
+    {{ userProfile(user) }}
+    {% endfor %}
+{% endmacro %}

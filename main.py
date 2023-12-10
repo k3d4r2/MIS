@@ -1,5 +1,4 @@
 from flask import Flask, render_template, flash, url_for, redirect, session
-from flask_bootstrap import Bootstrap
 import json
 import sys
 import pyrebase
@@ -12,6 +11,7 @@ from firebase_admin import credentials, auth
 
 
 config = None
+
 with open("config.json") as config_file:
     config = json.load(config_file)
 
@@ -73,8 +73,26 @@ def is_admin(uid):
     return False
 
 
+@app.route('/make-admin/<uid>')
 def make_admin(uid):
     auth.set_custom_user_claims(uid, {'admin': True})
+    return {"response": "Made admin"}
+
+
+@app.route('/remove-admin/<uid>')
+def remove_admin(uid):
+    auth.set_custom_user_claims(uid, {'admin': False})
+    return {"response": "Removed admin"}
+
+
+@app.route("/get-user/<uid>")
+def get_user(uid):
+    user_record = auth.get_user(uid)
+    user_dict = {
+        'uid': user_record.uid,
+        'email': user_record.email,
+    }
+    return user_dict
 
 
 @login_required
@@ -92,14 +110,10 @@ def is_cur_user_admin():
         # check if user is admin
         claims = auth.verify_id_token(id_token)
 
-        print(claims)
-
         if 'admin' in claims:
             if claims['admin'] is True:
-                print("==============Is admin==================")
                 return {'is_admin': True}
 
-        print("==============Is not a admin==================")
         return {'is_admin': False}
 
     return {'is_admin': False}
@@ -118,11 +132,11 @@ def signup():
         confirm = form.confirm.data
 
         try:
-            client_auth.create_user_with_email_and_password(mail, password)
-            flash('Created successfull')
+            user = client_auth.create_user_with_email_and_password(mail, password)
+            flash('============Created successfull==============')
+            auth.set_custom_user_claims(user["localId"], {'admin': False})
         except requests.exceptions.HTTPError as e:
             response = httpErrortoJSON(e)
-            print(response)
             if response['error']['code'] == 400:
 
                 if response['error']['code'] == 'EMAIL_EXISTS':
@@ -173,9 +187,6 @@ def login():
         session['user'] = user
         session['logged_in'] = True
 
-        print(session.get('user'))
-        # is_admin()
-
         return render_template("home.html")
 
     return render_template("login.html", form=form)
@@ -198,18 +209,25 @@ def logout():
 @app.route('/users', endpoint='users')
 @login_required
 def users():
+    '''
+        route to users page
+    '''
+    return render_template("users.html")
+
+
+@app.route('/users-list')
+@login_required
+def get_users_list():
     page = auth.list_users()
 
     users = []
     while page:
         for user in page.users:
-
             users.append({"uid": user.uid, "email": user.email,
-                          "is_admin": is_admin(user.uid)})
-
+                          "admin": user.custom_claims["admin"]})
         page = page.get_next_page()
 
-    return render_template("users.html", users=users)
+    return render_template("users-list.html", users=users)
 
 
 if __name__ == "__main__":

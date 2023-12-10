@@ -1,6 +1,9 @@
 
+@import 'user-profile.css';
+
 body {
      font-family: 'Montserrat', sans-serif;
+     user-select: none;
 }
 
 .form-container {
@@ -50,6 +53,7 @@ body {
 }
 
 .demo-container {
+    background-color: "#e0e0e0";
     height: 100vh;
     width: 100vw;
     display: flex;
@@ -61,3 +65,5 @@ body {
     position: absolute;
     right: 20px; 
 }
+
+
