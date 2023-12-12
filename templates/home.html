@@ -1,7 +1,13 @@
 
 {% extends 'base.html' %}
 {% block content %}
+    <div class="loader"></div>
+
     <div class="demo-container">
         {{ is_admin }}
     </div>
+
+    <script>
+        window.onload = hideLoader();
+    </script>
 {% endblock %}

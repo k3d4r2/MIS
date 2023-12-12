@@ -13,9 +13,9 @@
         User UID: {{ user.uid }}<br>
         User Email: {{ user.email }}
         {% if user.admin %}
-            <button onclick="removeAdmin('{{ user.uid }}')">Remove as admin</button>
+            <button class="neumorphic-button" onclick="removeAdmin('{{ user.uid }}')">Remove as admin</button>
         {% else %}
-            <button onclick="makeAdmin('{{ user.uid }}')">Add as admin</button>
+            <button class="neumorphic-button" onclick="makeAdmin('{{ user.uid }}')">Add as admin</button>
         {% endif %}
     </div>
 </div>
