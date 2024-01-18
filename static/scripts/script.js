@@ -12,7 +12,7 @@ async function fetchUserProfile(uid) {
     const url = '/get-user/' + uid;
 
     try {
-            const response = await fetch(url);
+        const response = await fetch(url);
 
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -114,4 +114,3 @@ function updateUsersList() {
             hideLoader();
         });
 }
-

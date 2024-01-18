@@ -17,6 +17,7 @@ config = None
 with open("config.json") as config_file:
     config = json.load(config_file)
 
+
 if not config:
     print("config file not found")
     sys.exit(1)
@@ -29,15 +30,17 @@ app.config['SECRET_KEY'] = "hello_everynyan"
 app.config['SESSION_TYPE'] = 'filesystem'
 
 
-cred = credentials.Certificate("./mis-dummy.json")
+cred = credentials.Certificate("./mid-dummy.json")
 firebase_admin.initialize_app(cred)
 
 
 firebase = pyrebase.initialize_app(config)
 client_auth = firebase.auth()
+storage = firebase.storage() 
+
+storage.child("images/example.jpg")
 
 # session.permanent = False
-
 
 def httpErrortoJSON(http_error):
     http_error = json.loads(re.sub(r'\[.*?\]', '', str(http_error)))
@@ -78,12 +81,22 @@ def is_admin(uid):
 
 @app.route('/uploads', methods=['GET', 'POST'])
 def upload():
+    '''
+        method to upload the files
+    '''
 
     if request.method == 'POST':
         f = request.files.get('file')
         f.save(os.path.join('./uploads', f.filename))
 
+        # upload demo file 
+        print(f.filename)
+        storage.child("images/example.jpg").put('./uploads/' + f.filename, session['user']['idToken'])
+
+        print("File uploaded to firebase successfully")
+
     return 'upload template'
+
 
 @app.route('/make-admin/<uid>')
 def make_admin(uid):
@@ -146,7 +159,7 @@ def signup():
 
         try:
             user = client_auth.create_user_with_email_and_password(mail, password)
-            flash('============Created successfull==============')
+            flash('Created successfull')
             auth.set_custom_user_claims(user["localId"], {'admin': False})
         except requests.exceptions.HTTPError as e:
             response = httpErrortoJSON(e)

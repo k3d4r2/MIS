@@ -3,11 +3,16 @@
 {% block content %}
     <div class="loader"></div>
 
-    <div class="demo-container">
+    <div class="upload-form-container">
         {% if is_admin %}
         {{ dropzone.create(action="/uploads") }}
-        {{ dropzone.config() }} 
+        {{ dropzone.config(custom_init='''dz = this;
+            document.getElementById("upload-button").addEventListener("click", function handler(e) {
+                dz.processQueue();
+                console.log("file uploaded");
+        });''') }} 
         {% endif %}
+        <button id="upload-button" class="neumorphic-button">Upload</button>
     </div>
 
     <script>
