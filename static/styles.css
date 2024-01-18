@@ -21,6 +21,14 @@ body {
     width: 100vw;
 }
 
+.dropzone {
+    border: 2px dashed #0087F7;
+    margin: 10%;
+    min-height: 400px;
+    width: 500px;
+    border-radius: 10%;
+}
+
 
 @keyframes backgroundAnimation {
     0% {

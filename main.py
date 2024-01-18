@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, url_for, redirect, session
+from flask import Flask, render_template, flash, url_for, redirect, session, request
 import json
 import sys
 import pyrebase
@@ -8,6 +8,8 @@ from forms import SignupForm, LoginForm
 from functools import wraps
 import firebase_admin
 from firebase_admin import credentials, auth
+from flask_dropzone import Dropzone
+import os
 
 
 config = None
@@ -20,6 +22,8 @@ if not config:
     sys.exit(1)
 
 app = Flask(__name__, static_folder='./static')
+
+dropzone = Dropzone(app)
 
 app.config['SECRET_KEY'] = "hello_everynyan"
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -72,6 +76,14 @@ def is_admin(uid):
             return True
     return False
 
+@app.route('/uploads', methods=['GET', 'POST'])
+def upload():
+
+    if request.method == 'POST':
+        f = request.files.get('file')
+        f.save(os.path.join('./uploads', f.filename))
+
+    return 'upload template'
 
 @app.route('/make-admin/<uid>')
 def make_admin(uid):
@@ -92,6 +104,7 @@ def get_user(uid):
         'uid': user_record.uid,
         'email': user_record.email,
     }
+
     return user_dict
 
 
