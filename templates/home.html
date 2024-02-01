@@ -8,9 +8,11 @@
         {{ dropzone.create(action="/uploads") }}
         {{ dropzone.config(custom_init='''dz = this;
             document.getElementById("upload-button").addEventListener("click", function handler(e) {
-                dz.processQueue();
-                console.log("file uploaded");
-        });''') }} 
+            dz.processQueue();
+            console.log("file uploaded");
+            });''', 
+            custom_options='autoProcessQueue: false') 
+        }} 
         {% endif %}
         <button id="upload-button" class="neumorphic-button">Upload</button>
     </div>

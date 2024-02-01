@@ -7,7 +7,7 @@ import requests
 from forms import SignupForm, LoginForm
 from functools import wraps
 import firebase_admin
-from firebase_admin import credentials, auth
+from firebase_admin import credentials, auth, storage 
 from flask_dropzone import Dropzone
 import os
 
@@ -31,16 +31,20 @@ app.config['SESSION_TYPE'] = 'filesystem'
 
 
 cred = credentials.Certificate("./mid-dummy.json")
-firebase_admin.initialize_app(cred)
+firebase_admin.initialize_app(cred, {'storageBucket': 'mid-dummy.appspot.com'})
+
+# google storage
+
+
+bucket = storage.bucket()
 
 
 firebase = pyrebase.initialize_app(config)
+
 client_auth = firebase.auth()
-storage = firebase.storage() 
 
-storage.child("images/example.jpg")
+# storage = firebase.storage() 
 
-# session.permanent = False
 
 def httpErrortoJSON(http_error):
     http_error = json.loads(re.sub(r'\[.*?\]', '', str(http_error)))
@@ -79,21 +83,24 @@ def is_admin(uid):
             return True
     return False
 
+
 @app.route('/uploads', methods=['GET', 'POST'])
 def upload():
     '''
         method to upload the files
     '''
-
     if request.method == 'POST':
         f = request.files.get('file')
         f.save(os.path.join('./uploads', f.filename))
 
         # upload demo file 
         print(f.filename)
-        storage.child("images/example.jpg").put('./uploads/' + f.filename, session['user']['idToken'])
+        # storage.child("images/" + f.filename).put('./uploads/' + f.filename, session['user']['idToken'])
 
-        print("File uploaded to firebase successfully")
+        blob = bucket.blob("uploads/" + f.filename)
+        blob.upload_from_filename("./uploads/" + f.filename)
+
+        print(f"File {f.filename} uploaded to firebase successfully")
 
     return 'upload template'
 
