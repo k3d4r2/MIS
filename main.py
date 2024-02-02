@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, flash, url_for, redirect, session, request
 import json
 import sys
@@ -10,13 +11,13 @@ import firebase_admin
 from firebase_admin import credentials, auth, storage 
 from flask_dropzone import Dropzone
 import os
+from datetime import timezone, datetime
 
 
 config = None
 
 with open("config.json") as config_file:
     config = json.load(config_file)
-
 
 if not config:
     print("config file not found")
@@ -34,17 +35,13 @@ cred = credentials.Certificate("./mid-dummy.json")
 firebase_admin.initialize_app(cred, {'storageBucket': 'mid-dummy.appspot.com'})
 
 # google storage
-
-
 bucket = storage.bucket()
-
 
 firebase = pyrebase.initialize_app(config)
 
 client_auth = firebase.auth()
 
 # storage = firebase.storage() 
-
 
 def httpErrortoJSON(http_error):
     http_error = json.loads(re.sub(r'\[.*?\]', '', str(http_error)))
@@ -229,6 +226,24 @@ def login():
 @login_required
 def home():
     return render_template("home.html")
+
+
+@app.route('/files', endpoint='files')
+@login_required
+def files():
+
+    prefix = "uploads/"
+    # get urls of images
+    blobs = bucket.list_blobs(prefix=prefix)
+
+    print(session['user'])
+
+    image_paths = [blob.name for blob in blobs]
+    
+    expiration = int(datetime.now(tz=timezone.utc).timestamp()) + 3600
+    public_urls = [bucket.blob(image_path).generate_signed_url(expiration=expiration) for image_path in image_paths]
+
+    return render_template("files.html", file_urls=public_urls)
 
 
 @app.route('/logout', endpoint='logout')

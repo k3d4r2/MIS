@@ -3,6 +3,7 @@
 @import 'loader.css';
 @import 'upload-form-style.css';
 
+
 body {
     font-family: 'Montserrat', sans-serif;
     background-color: #efefef;
@@ -110,3 +111,19 @@ body {
   background-color: #1d2630aa;
   border-radius: 50%;
 }
+
+.image-grid-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.image-grid-container > img {
+    flex: 1;
+    margin: 10px;
+    border-radius: 5%;
+    max-width: 350px;
+    max-height: 250px;
+}
+

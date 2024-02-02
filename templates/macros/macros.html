@@ -1,4 +1,12 @@
 
+
+{% macro imageBlob(url) %}
+
+    <img src='{{ url }}' class="image" style="height: 400px">
+    
+{% endmacro %}
+
+
 {% macro userProfileWindow(user) %}
 <div class="user-container" id="user-{{ user.uid }}">
     <div class="floating-button">

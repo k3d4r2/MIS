@@ -1,0 +1,17 @@
+
+{% from 'macros/macros.html' import imageBlob %}
+
+{% extends 'base.html' %}
+{% block content %}
+    <div class="loader"></div>
+
+    <div class="image-grid-container">
+        {% for url in file_urls %}
+        {{ imageBlob(url) }}<br>
+        {% endfor %}
+    </div>
+
+    <script>
+        window.onload = hideLoader();
+    </script>
+{% endblock %}
